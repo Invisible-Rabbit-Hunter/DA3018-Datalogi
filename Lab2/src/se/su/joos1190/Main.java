@@ -5,7 +5,7 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in).useDelimiter("\\s+");
-        Stack stk = new Stack();
+        Stack<Double> stk = new Stack<>(Double.class);
 
         while (scanner.hasNext()) {
             String item = scanner.next();
@@ -24,7 +24,7 @@ public class Main {
                     case "-": {
                         double a = stk.pop();
                         double b = stk.pop();
-                        stk.push(a - b);
+                        stk.push(b - a);
                     }
                     break;
 
@@ -38,7 +38,7 @@ public class Main {
                     case "/": {
                         double a = stk.pop();
                         double b = stk.pop();
-                        stk.push(a / b);
+                        stk.push(b / a);
                     }
                     break;
 
