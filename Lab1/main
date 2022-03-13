@@ -1,0 +1,65 @@
+#!/bin/sh
+
+# Get all pairs, each ordered lexicographically.
+pairs ()
+{
+  awk '{if ($1 < $2) print $2 " " $1; else print $1 " " $2}' $@
+}
+
+# Get all distinct pairs, each ordered lexicographically.
+distinct_pairs ()
+{
+  pairs $@ | awk '!seen[$0]++'
+}
+
+# Get all identifiers.
+identifiers ()
+{
+  cat $@ | tr -s ' ' '\n'
+}
+
+# Get all distinct identifiers.
+distinct_identifiers ()
+{
+  identifiers $@ | awk '!seen[$0]++'
+}
+
+# Get the number of lines in each file.
+printf "Line counts:\n"
+wc -l pairs*.txt | head -n 2 | awk '{print $2 ": " $1}'
+
+# distinct_pairs pairs1.txt | wc -l
+# distinct_pairs pairs2.txt | wc -l
+
+# Grep each file for the identifier "fp.2.Luci_02H12.ctg.ctg7180000019650" and
+# print the count.
+printf "\nNumber of pairs containing fp.2.Luci_02H12.ctg.ctg7180000019650:\n"
+printf "pairs1.txt: "
+pairs pairs1.txt | grep -c "fp.2.Luci_02H12.ctg.ctg7180000019650"
+printf "pairs2.txt: "
+pairs pairs2.txt | grep -c "fp.2.Luci_02H12.ctg.ctg7180000019650"
+
+printf "\nNumber of distinct pairs containing fp.2.Luci_02H12.ctg.ctg7180000019650:\n"
+printf "pairs1.txt: "
+distinct_pairs pairs1.txt | grep -c "fp.2.Luci_02H12.ctg.ctg7180000019650"
+printf "pairs2.txt: "
+distinct_pairs pairs2.txt | grep -c "fp.2.Luci_02H12.ctg.ctg7180000019650"
+
+# Get the total number of distinct identifiers.
+printf "\nTotal number of distinct identifiers: "
+distinct_identifiers pairs1.txt pairs2.txt | wc -l
+
+# Get the number of duplicate pairs in each file.
+printf "\nRepeat pairs in pairs1.txt:\n"
+pairs pairs1.txt | awk '1<++seen[$0]'
+
+printf "\nRepeat pairs in pairs2.txt:\n"
+pairs pairs2.txt | awk '1<++seen[$0]'
+
+# distinct_pairs pairs1.txt pairs2.txt | wc -l
+# comm -13 <(pairs pairs1.txt | sort -u) <(pairs pairs2.txt | sort -u) | wc -l
+# comm -23 <(pairs pairs1.txt | sort -u) <(pairs pairs2.txt | sort -u) | wc -l
+                  
+# Get the number of pairs that appear in both files.
+printf "\nNumber of (distinct) edges in common: "
+comm -12 <(pairs pairs1.txt | sort -u) <(pairs pairs2.txt | sort -u) | wc -l
