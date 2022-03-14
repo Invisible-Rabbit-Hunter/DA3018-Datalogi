@@ -120,19 +120,24 @@ public class BinarySearchTree implements Iterable<BinarySearchTree.BSTNode> {
 				return node.getLeftChild();
 			}
 
-			BSTNode beforeLeast = node;
 			BSTNode least = node.getRightChild();
-			while (least.getLeftChild() != null) {
-				beforeLeast = least;
-				least = least.getLeftChild();
+
+			// If the first right child has no left child, simply place it where /node/ is, with the left child of /node/
+			// as left child.
+			if (least.getRightChild() == null) {
+				least.setChildren(node.getLeftChild(), least.getRightChild());
+			} else {
+				// Otherwise, find the least element and replace it with node.
+				BSTNode beforeLeast = node;
+				while (least.getLeftChild() != null) {
+					beforeLeast = least;
+					least = least.getLeftChild();
+				}
+
+				beforeLeast.setChildren(least.getRightChild(), beforeLeast.getRightChild());
+				least.setChildren(node.getLeftChild(), node.getRightChild());
 			}
 
-			if (beforeLeast == node) {
-				beforeLeast.setChildren(least.getRightChild(), null);
-			} else {
-				beforeLeast.setChildren(least.getRightChild(), beforeLeast.getRightChild());
-			}
-			least.setChildren(node.getLeftChild(), node.getRightChild());
 			return least;
 		}
 	}
