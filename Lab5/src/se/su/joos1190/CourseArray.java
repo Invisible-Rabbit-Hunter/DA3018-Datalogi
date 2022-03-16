@@ -2,10 +2,7 @@ package se.su.joos1190;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class CourseArray {
     public ArrayList<String> courses = new ArrayList<String>(); // Store course names in this attribute
@@ -31,20 +28,19 @@ public class CourseArray {
      * Time complexity: quadratic in the number of elements in 'courses' array.
      */
     public void selectionSort() {
-        // To implement
-        for (int i = 0; i < courses.size(); i++) {
-            String item = courses.get(i);
-            for (int j = 0; j < i; j++) {
-                String tmp = courses.get(j);
-                if (item.compareTo(tmp) < 0) {
-                    courses.set(j, item);
-                    courses.set(i, tmp);
-                    item = tmp;
+        for (int unsorted = 0; unsorted < courses.size(); unsorted++) {
+            int min = unsorted;
+            for (int j = unsorted; j < courses.size(); j++) {
+                if (courses.get(j).compareTo(courses.get(min)) < 0) {
+                    min = j;
                 }
             }
+
+            String tmp = courses.get(unsorted);
+            courses.set(unsorted, courses.get(min));
+            courses.set(min, tmp);
         }
     }
-
 
     /*
      * mergeSort - implements the Merge Sort algorithm
@@ -74,19 +70,7 @@ public class CourseArray {
         String[] result = new String[end - start];
 
         int l = 0, h = 0;
-        while (l + h < end - start) {
-            if (l >= mid - start) {
-                result[l+h] = courses.get(mid + h);
-                h++;
-                continue;
-            }
-
-            if (h >= end - mid) {
-                result[l+h] = courses.get(start + l);
-                l++;
-                continue;
-            }
-
+        while (l < mid - start && h < end - mid) {
             String x = courses.get(start + l);
             String y = courses.get(mid + h);
             if (x.compareTo(y) < 0) {
@@ -98,10 +82,21 @@ public class CourseArray {
             }
         }
 
+        while (l < mid - start) {
+            result[l+h] = courses.get(start + l);
+            l++;
+        }
+
+        while (h < end - mid) {
+            result[l+h] = courses.get(mid + h);
+            h++;
+        }
+
         for (int i = start; i < end; i++) {
             courses.set(i, result[i - start]);
         }
     }
+
 
 
     /*
@@ -115,6 +110,33 @@ public class CourseArray {
         courses.sort(String::compareTo);
     }
 
+    private static String sharedPrefix(String s1, String s2) {
+        int capacity = Math.min(s1.length(), s2.length());
+        StringBuilder result = new StringBuilder(capacity);
+        for (int i = 0; i < capacity; i++) {
+            if (s1.charAt(i) != s2.charAt(i)) {
+                break;
+            }
+
+            result.append(s1.charAt(i));
+        }
+
+        return result.toString();
+    }
+
+    public String longestSharedPrefix() {
+        mergeSort();
+
+        String longestPrefix = "";
+        for(int i = 0; i < courses.size() - 1; i++) {
+            String prefix = sharedPrefix(courses.get(i), courses.get(i+1));
+            if (longestPrefix.length() < prefix.length()) {
+                longestPrefix = prefix;
+            }
+        }
+
+        return longestPrefix;
+    }
 
     /*
      * loadData - Convenience function. Reads lines from stdin and put them in 'courses'.
@@ -126,9 +148,7 @@ public class CourseArray {
             courses.add(c);
         }
     }
-
-    private void loadData(String fname) {
-        File file = new File(fname);
+    private void loadData(File file) {
         Scanner sc = null;
         try {
             sc = new Scanner(file);
@@ -154,7 +174,7 @@ public class CourseArray {
         // We create 3 CourseArray objects. They contain the same
         // data, but we can apply three different sorting algorithms on them independently.
         CourseArray courses1 = new CourseArray();
-        courses1.loadData("data/all_courses.txt");    // Read course names from stdin
+        courses1.loadData(new File("data/all_courses.txt"));    // Read course names from stdin
 
         CourseArray courses2 = new CourseArray(courses1); // Copy the data to two more arrays using the copy-constructor
         CourseArray courses3 = new CourseArray(courses1);
@@ -186,5 +206,7 @@ public class CourseArray {
             System.out.format("Time for task %s: %d ms", algs[i], checkpoints[i] - checkpoints[i-1]);
             System.out.println();
         }
+
+        System.out.format("Longest prefix: %s", courses1.longestSharedPrefix());
     }
 }
