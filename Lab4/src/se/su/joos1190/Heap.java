@@ -22,7 +22,7 @@ public class Heap<E extends Comparable<E>> {                    // Note: just th
     @SuppressWarnings("unchecked")
     Heap(Class<E> c, int _capacity) {
         capacity = _capacity;
-        heap_array = (E[]) java.lang.reflect.Array.newInstance(c, capacity+1);
+        heap_array = (E[]) java.lang.reflect.Array.newInstance(c, capacity);
     }
     /*
         i = 2
@@ -45,7 +45,7 @@ public class Heap<E extends Comparable<E>> {                    // Note: just th
     }
 
     private static int parent(int i) {
-        return i == 0 ? 0 : (i - 1) >> 1;
+        return (i - 1) >> 1;
     }
 
     /**
