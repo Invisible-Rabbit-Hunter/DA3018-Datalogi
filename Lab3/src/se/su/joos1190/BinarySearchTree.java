@@ -162,8 +162,8 @@ public class BinarySearchTree implements Iterable<BinarySearchTree.BSTNode> {
 
 				var head = current.get(0);
 				current.remove(0);
-				current.add(head.left);
-				current.add(head.right);
+				if (head.left != null) current.add(head.left);
+				if (head.right != null) current.add(head.right);
 
 				return head;
 			}

@@ -7,15 +7,20 @@ import java.util.Scanner;
 public class CourseInfo {
 
 	public static void main(String[] args) {
-		var file = new File("courses.csv");
-		Scanner scanner;
-		try {
-			scanner = new Scanner(file).useDelimiter("\\s*(,|\\n)\\s*");
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return;
+		if (args.length < 1) {
+			System.out.println("Error: A file must be provided.");
+			System.exit(1);
 		}
 
+		var file = new File(args[0]);
+		Scanner scanner;
+		try {
+			scanner = new Scanner(file).useDelimiter("\\s*([,\\n])\\s*");
+		} catch (FileNotFoundException e) {
+			System.out.format("File %s was not found!", args[0]);
+			System.exit(1);
+			return;
+		}
 
 		BinarySearchTree courses = new BinarySearchTree();
 
@@ -25,22 +30,27 @@ public class CourseInfo {
 			var courseCredits = scanner.nextDouble();
 			courses.insert(courseCode, courseName, courseCredits);
 		}
-		int n = courses.size();
-		System.out.printf("There are %d courses in the database.\n", n);
-		
-		String name = courses.find("MM2001").getCourseName();
-		System.out.printf("Name: %s\n", name);
-		courses.remove("DA3018");
-		name = courses.find("DA4001").getCourseName();
-		System.out.printf("Name: %s\n", name);
-		courses.remove("DA4002");
-		name = courses.find("DA4001").getCourseName();
-		System.out.printf("Name: %s\n", name);
-		courses.remove("MM2001");
-		name = courses.find("MM5016").getCourseName();
-		System.out.printf("Name: %s\n", name);
-		name = courses.find("MM2001").getCourseName();
-		System.out.printf("Name: %s\n", name);
+
+		if (args.length < 2) {
+			double creditTotal = 0;
+			for (BinarySearchTree.BSTNode course : courses) {
+				creditTotal += course.getCredits();
+				System.out.format("%s %-34s %#4.1f\n", course.getCourseCode(), course.getCourseName(), course.getCredits());
+			}
+			System.out.format("Summa%#41.1f\n", creditTotal);
+			int n = courses.size();
+			System.out.printf("There are %d courses in the database.\n", n);
+		} else {
+			String courseCode = args[1];
+			BinarySearchTree.BSTNode course = courses.find(courseCode);
+			if (course != null) {
+				System.out.format("%s %s   %#4.1f\n", course.getCourseCode(), course.getCourseName(), course.getCredits());
+			} else {
+				System.out.format("Course with code %s does not exist in database!", courseCode);
+				System.exit(1);
+			}
+		}
+
 	}
 
 }
