@@ -2,7 +2,8 @@ package se.su.joos1190;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 public class CourseArray {
     public ArrayList<String> courses = new ArrayList<String>(); // Store course names in this attribute
@@ -51,52 +52,44 @@ public class CourseArray {
      * Time complexity: O(n lg n) comparisons, where n is the number of elements in the course array.
      */
     public void mergeSort() {
-        mergeSort(0, courses.size());
-    }
-
-    public void mergeSort(int start, int end) {
-        if (end - start <= 1) {
+        if (courses.size() <= 1) {
             return;
         }
+        String[] helper = new String[courses.size()];
 
-        int mid = start + (end - start) / 2;
-        mergeSort(start, mid);
-        mergeSort(mid, end);
-
-        merge(start, mid, end);
+        for (int size = 1; size < courses.size(); size <<= 1) {
+            for (int i = 0; i + size < courses.size(); i += 2 * size) {
+                merge(helper, i, i + size, Math.min(i + 2 * size, courses.size()));
+            }
+        }
     }
 
-    public void merge(int start, int mid, int end) {
-        String[] result = new String[end - start];
-
-        int l = 0, h = 0;
-        while (l < mid - start && h < end - mid) {
-            String x = courses.get(start + l);
-            String y = courses.get(mid + h);
-            if (x.compareTo(y) < 0) {
-                result[l+h] = x;
+    private void merge(String[] helper, int start, int mid, int end) {
+        int l = start, h = mid;
+        for (int i = start; i < end; i++) {
+            if (l >= mid) {
+                helper[i] = courses.get(h);
+                h++;
+            } else if (h >= end) {
+                helper[i] = courses.get(l);
                 l++;
             } else {
-                result[l+h] = y;
-                h++;
+                String x = courses.get(l);
+                String y = courses.get(h);
+                if (x.compareTo(y) < 0) {
+                    helper[i] = x;
+                    l++;
+                } else {
+                    helper[i] = y;
+                    h++;
+                }
             }
         }
 
-        while (l < mid - start) {
-            result[l+h] = courses.get(start + l);
-            l++;
-        }
-
-        while (h < end - mid) {
-            result[l+h] = courses.get(mid + h);
-            h++;
-        }
-
         for (int i = start; i < end; i++) {
-            courses.set(i, result[i - start]);
+            courses.set(i, helper[i]);
         }
     }
-
 
 
     /*
@@ -174,8 +167,8 @@ public class CourseArray {
         // We create 3 CourseArray objects. They contain the same
         // data, but we can apply three different sorting algorithms on them independently.
         CourseArray courses1 = new CourseArray();
-        courses1.loadData();    // Read course names from stdin
 
+        courses1.loadData(new File("data/all_courses.txt"));    // Read course names from stdin
         CourseArray courses2 = new CourseArray(courses1); // Copy the data to two more arrays using the copy-constructor
         CourseArray courses3 = new CourseArray(courses1);
 
