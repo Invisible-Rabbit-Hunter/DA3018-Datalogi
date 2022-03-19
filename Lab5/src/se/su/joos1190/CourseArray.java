@@ -168,7 +168,7 @@ public class CourseArray {
         // data, but we can apply three different sorting algorithms on them independently.
         CourseArray courses1 = new CourseArray();
 
-        courses1.loadData(new File("data/all_courses.txt"));    // Read course names from stdin
+        courses1.loadData();    // Read course names from stdin
         CourseArray courses2 = new CourseArray(courses1); // Copy the data to two more arrays using the copy-constructor
         CourseArray courses3 = new CourseArray(courses1);
 
