@@ -1,10 +1,12 @@
 package se.su.joos1190;
 
+import java.util.NoSuchElementException;
+
 public class Stack<E> {
     private final int MIN_CAP = 1<<15;
     private E[] data; // Invariant: MIN_CAP <= data.length
     private int size; // Invariant: 0 <= size <= data.length
-    private Class<E> eClass;
+    private final Class<E> eClass;
 
     @SuppressWarnings("unchecked")
     public Stack(Class<E> c) {
@@ -15,11 +17,8 @@ public class Stack<E> {
 
     @SuppressWarnings("unchecked")
     private void resize(int new_cap) {
-        new_cap = Math.min(new_cap, MIN_CAP);
-
         if (new_cap < size) {
-            // TODO: Replace with more precise exception.
-            throw new UnsupportedOperationException();
+            throw new IllegalArgumentException("Illegal argument: new capacity is less than current size");
         }
 
         E[] new_data = (E[]) java.lang.reflect.Array.newInstance(eClass, MIN_CAP);
@@ -42,15 +41,14 @@ public class Stack<E> {
 
     public E pop() {
         if (size == 0) {
-            // TODO: Replace with more precise exception.
-            throw new UnsupportedOperationException();
+            throw new NoSuchElementException("No such element: Trying to pop from empty stack");
         }
 
         E result = data[size-1];
         size--;
 
-        if (2*size >= data.length) {
-            resize(size);
+        if (4*size >= data.length) {
+            resize(Math.min(data.length>>2, MIN_CAP));
         }
 
         return result;
