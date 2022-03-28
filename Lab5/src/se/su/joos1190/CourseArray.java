@@ -141,18 +141,7 @@ public class CourseArray {
             courses.add(c);
         }
     }
-    private void loadData(File file) {
-        Scanner sc = null;
-        try {
-            sc = new Scanner(file);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        while (sc.hasNext()) {
-            String c = sc.nextLine();
-            courses.add(c);
-        }
-    }
+
     public boolean sorted() {
         for (int i=1; i<courses.size(); i++) {
             if (courses.get(i).compareTo(courses.get(i-1)) < 0) {
@@ -172,7 +161,7 @@ public class CourseArray {
         CourseArray courses2 = new CourseArray(courses1); // Copy the data to two more arrays using the copy-constructor
         CourseArray courses3 = new CourseArray(courses1);
 
-        long checkpoints[] = new long[4]; // To store timestamps in
+        long[] checkpoints = new long[4]; // To store timestamps in
         // Start tests
         checkpoints[0] = System.currentTimeMillis();
         courses1.selectionSort();
@@ -193,7 +182,7 @@ public class CourseArray {
             System.out.println("courses3 is not sorted");
         }
 
-        String algs[] = {"", "selectionSort", "mergeSort", "javaSort"};
+        String[] algs = {"", "selectionSort", "mergeSort", "javaSort"};
         // Output timing results
         for (int i=1; i<4; i++) {
             System.out.format("Time for task %s: %d ms", algs[i], checkpoints[i] - checkpoints[i-1]);
