@@ -55,11 +55,8 @@ pairs pairs1.txt | awk '1<++seen[$0]'
 
 printf "\nRepeat pairs in pairs2.txt:\n"
 pairs pairs2.txt | awk '1<++seen[$0]'
-
-# distinct_pairs pairs1.txt pairs2.txt | wc -l
-# comm -13 <(pairs pairs1.txt | sort -u) <(pairs pairs2.txt | sort -u) | wc -l
-# comm -23 <(pairs pairs1.txt | sort -u) <(pairs pairs2.txt | sort -u) | wc -l
                   
 # Get the number of pairs that appear in both files.
 printf "\nNumber of (distinct) edges in common: "
-comm -12 <(pairs pairs1.txt | sort -u) <(pairs pairs2.txt | sort -u) | wc -l
+comm -12 <(distinct_pairs pairs1.txt | sort -u) \
+         <(distinct_pairs pairs2.txt | sort -u) | wc -l
