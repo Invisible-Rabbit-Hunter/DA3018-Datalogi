@@ -1,12 +1,12 @@
 #!/bin/sh
 
-# Get all pairs, each ordered lexicographically.
+# Get all pairs, each pair ordered lexicographically.
 pairs ()
 {
   awk '{if ($1 < $2) print $2 " " $1; else print $1 " " $2}' $@
 }
 
-# Get all distinct pairs, each ordered lexicographically.
+# Get all distinct pairs, each pair ordered lexicographically.
 distinct_pairs ()
 {
   pairs $@ | awk '!seen[$0]++'
@@ -51,12 +51,12 @@ distinct_identifiers pairs1.txt pairs2.txt | wc -l
 
 # Get the number of duplicate pairs in each file.
 printf "\nRepeat pairs in pairs1.txt:\n"
-pairs pairs1.txt | awk '1<++seen[$0]'
+pairs pairs1.txt | sort | uniq -d
 
 printf "\nRepeat pairs in pairs2.txt:\n"
-pairs pairs2.txt | awk '1<++seen[$0]'
+pairs pairs2.txt | sort | uniq -d
                   
 # Get the number of pairs that appear in both files.
 printf "\nNumber of (distinct) edges in common: "
-comm -12 <(distinct_pairs pairs1.txt | sort -u) \
-         <(distinct_pairs pairs2.txt | sort -u) | wc -l
+sort <(distinct_pairs pairs1.txt) <(distinct_pairs pairs2.txt) | uniq -d | wc -l
+
