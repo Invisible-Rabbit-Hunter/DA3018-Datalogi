@@ -24,39 +24,32 @@ distinct_identifiers ()
   identifiers $@ | awk '!seen[$0]++'
 }
 
+
+printf "1. How many lines do the two files contain? Count for each file separately using a single command and “globbing”.\n"
 # Get the number of lines in each file.
-printf "Line counts:\n"
 wc -l pairs*.txt | head -n 2 | awk '{print $2 ": " $1}'
 
-# distinct_pairs pairs1.txt | wc -l
-# distinct_pairs pairs2.txt | wc -l
-
+printf "\n2. In how many pairs do we find the identifier “fp.2.Luci_02H12.ctg.ctg7180000019650”? Count in the two files separately (i.e., report two numbers).\n"
 # Grep each file for the identifier "fp.2.Luci_02H12.ctg.ctg7180000019650" and
 # print the count.
-printf "\nNumber of pairs containing fp.2.Luci_02H12.ctg.ctg7180000019650:\n"
 printf "pairs1.txt: "
 pairs pairs1.txt | grep -c "fp.2.Luci_02H12.ctg.ctg7180000019650"
 printf "pairs2.txt: "
 pairs pairs2.txt | grep -c "fp.2.Luci_02H12.ctg.ctg7180000019650"
 
-printf "\nNumber of distinct pairs containing fp.2.Luci_02H12.ctg.ctg7180000019650:\n"
-printf "pairs1.txt: "
-distinct_pairs pairs1.txt | grep -c "fp.2.Luci_02H12.ctg.ctg7180000019650"
-printf "pairs2.txt: "
-distinct_pairs pairs2.txt | grep -c "fp.2.Luci_02H12.ctg.ctg7180000019650"
-
 # Get the total number of distinct identifiers.
-printf "\nTotal number of distinct identifiers: "
+printf "\n3. How many distinct identifiers do we have? That is, if you have seen the identifiers a, b, a, c, a, then there are three distinct identifiers: a, b, and c. Count the two files together as one dataset. Hint: The tr command can be useful here.\n"
 distinct_identifiers pairs1.txt pairs2.txt | wc -l
 
 # Get the number of duplicate pairs in each file.
-printf "\nRepeat pairs in pairs1.txt:\n"
+printf "\n4. There are actually two pairs that are appear twice in the two files. Which pairs and in which file?\n"
+printf "Repeat pairs in pairs1.txt:\n"
 pairs pairs1.txt | sort | uniq -d
 
 printf "\nRepeat pairs in pairs2.txt:\n"
 pairs pairs2.txt | sort | uniq -d
                   
 # Get the number of pairs that appear in both files.
-printf "\nNumber of (distinct) edges in common: "
+printf "\n5. Write a "one-liner", using shell commands, to compute the number of shared edges (i.e., columns) found in pairs1.txt and pairs2.txt. That is, write a shell command, using pipes, that computes the intersection of the edge sets represented in the two files. You must handle the fact that the line "a b" represents the same edge as \"b a\".\n"
 sort <(distinct_pairs pairs1.txt) <(distinct_pairs pairs2.txt) | uniq -d | wc -l
 
