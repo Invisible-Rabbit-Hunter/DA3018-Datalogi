@@ -8,6 +8,10 @@ public class Stack<E> {
     private int size; // Invariant: 0 <= size <= data.length
     private final Class<E> eClass;
 
+    /**
+     * Constructor.
+     * @param c the Class instance.
+     */
     @SuppressWarnings("unchecked")
     public Stack(Class<E> c) {
         size = 0;
@@ -15,6 +19,11 @@ public class Stack<E> {
         data = (E[]) java.lang.reflect.Array.newInstance(eClass, MIN_CAP);
     }
 
+    /**
+     * Resizes the data array to {@code new_cap}.
+     * @param new_cap New capacity.
+     * @throws IllegalArgumentException if {@code new_cap < size}.
+     */
     @SuppressWarnings("unchecked")
     private void resize(int new_cap) {
         if (new_cap < size) {
@@ -27,10 +36,18 @@ public class Stack<E> {
         data = new_data;
     }
 
+    /**
+     * Check if the stack is empty.
+     * @return {@code true} if the stack is empty, {@code false} otherwise.
+     */
     public boolean is_empty() {
         return size == 0;
     }
 
+    /**
+     * Push a value onto the front of the stack.
+     * @param value the value to be pushed onto the stack.
+     */
     public void push(E value) {
         if (size == data.length) {
             resize(2*size);
@@ -39,6 +56,10 @@ public class Stack<E> {
         size++;
     }
 
+    /**
+     * Pop an element from the front of the stack
+     * @return the element removed from the stack
+     */
     public E pop() {
         if (size == 0) {
             throw new NoSuchElementException("No such element: Trying to pop from empty stack");
@@ -47,7 +68,7 @@ public class Stack<E> {
         E result = data[size-1];
         size--;
 
-        if (4*size >= data.length) {
+        if (4*size <= data.length) {
             resize(Math.min(data.length>>2, MIN_CAP));
         }
 
