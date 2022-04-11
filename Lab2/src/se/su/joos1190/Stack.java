@@ -3,6 +3,21 @@ package se.su.joos1190;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
+/*
+ * Run the program with
+ * $ java -jar RPN.jar
+ * The program reads from stdin, so
+ * you can also run a file by simply feeding
+ * stdin to the program, eg
+ * $ java -jar RPN.jar <test.input
+ * to run the program in the test.
+ * To see that it gives the expected result,
+ * run:
+ * $ diff <(java -jar RPN.jar <test.input) test.expected
+ * If stdout is empty, the result was as expected, otherwise
+ * a diff shows where it failed, and both the returned and
+ * expected result.
+ */
 public class Stack<E> {
     private final int MIN_CAP = 1<<15;
     private E[] data; // Invariant: MIN_CAP <= data.length
