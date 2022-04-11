@@ -1,6 +1,5 @@
 package se.su.joos1190;
 
-import java.sql.Array;
 import java.util.*;
 
 /**
@@ -97,10 +96,23 @@ public class BinarySearchTree implements Iterable<BinarySearchTree.BSTNode> {
         root = remove(root, courseCode);
     }
 
+    // Get the minimal node (left-most node).
+    private BSTNode extractMin(BSTNode parent, BSTNode node) {
+        if (node == null) {
+            throw new NoSuchElementException("min: Trying to find minimum node of empty node.");
+        }
+
+        if (node.getLeftChild() == null) {
+            parent.setChildren(node.getRightChild(), parent.getRightChild());
+            return node;
+        }
+
+        return extractMin(node, node.getLeftChild());
+    }
 
     private BSTNode remove(BSTNode node, String courseCode) {
         if (node == null) {
-            throw new NoSuchElementException("remove: Trying to remove non-existent node.");
+            throw new NoSuchElementException("remove: Trying to remove empty node.");
         }
 
         int comparison = courseCode.compareTo(node.getCourseCode());
@@ -111,30 +123,20 @@ public class BinarySearchTree implements Iterable<BinarySearchTree.BSTNode> {
             node.setChildren(node.getLeftChild(), remove(node.getRightChild(), courseCode));
             return node;
         } else {
-            if (node.getLeftChild() == null) {
-                return node.getRightChild();
+            var left = node.getLeftChild();
+            var right = node.getRightChild();
+            if (left == null) {
+                return right;
+            }
+            if (right == null) {
+                return left;
             }
 
-            if (node.getRightChild() == null) {
-                return node.getLeftChild();
-            }
-
-            BSTNode least = node.getRightChild();
-
-            // If the first right child has no left child, simply place it where /node/ is, with the left child of /node/
-            // as left child.
-            if (least.getRightChild() == null) {
-                least.setChildren(node.getLeftChild(), least.getRightChild());
+            BSTNode least = extractMin(node, right);
+            if (least == right) {
+                least.setChildren(left, right.getRightChild());
             } else {
-                // Otherwise, find the least element and replace it with node.
-                BSTNode beforeLeast = node;
-                while (least.getLeftChild() != null) {
-                    beforeLeast = least;
-                    least = least.getLeftChild();
-                }
-
-                beforeLeast.setChildren(least.getRightChild(), beforeLeast.getRightChild());
-                least.setChildren(node.getLeftChild(), node.getRightChild());
+                least.setChildren(left, right);
             }
 
             return least;
@@ -143,29 +145,65 @@ public class BinarySearchTree implements Iterable<BinarySearchTree.BSTNode> {
 
     @Override
     public Iterator<BSTNode> iterator() {
-        var current = new ArrayList<BSTNode>();
-        current.add(root);
+        return new BSTIterator(root);
+    }
 
-        return new Iterator<BSTNode>() {
-            @Override
-            public boolean hasNext() {
-                return current.size() != 0;
+    private class BSTIterator implements Iterator<BSTNode> {
+        Stack<BSTNode> current;
+
+        public BSTIterator(BSTNode start) {
+            if (start == null) {
+                throw new IllegalArgumentException("initial node must be non-null");
             }
 
-            @Override
-            public BSTNode next() {
-                if (current.isEmpty()) {
-                    throw new NoSuchElementException();
-                }
+            current = new Stack<>();
+            current.add(start);
+        }
+        @Override
+        public boolean hasNext() {
+            return !current.isEmpty();
+        }
 
-                var head = current.get(0);
-                current.remove(0);
-                if (head.left != null) current.add(head.left);
-                if (head.right != null) current.add(head.right);
+        @Override
+        public BSTNode next() {
+            var here = current.pop();
+            if (here.left != null) current.push(here.left);
+            if (here.right != null) current.push(here.right);
+            return here;
+        }
+    }
 
-                return head;
-            }
-        };
+
+    public static void main(String[] args)
+    {
+        BinarySearchTree tree = new BinarySearchTree();
+        tree.insert("DA3018", "Datalogi", 7.5);
+        tree.insert("MM2001", "Matematik I", 30);
+        tree.insert("DA2004", "Programmeringsteknik", 7.5);
+        tree.insert("DA4002", "Mjukvaruutveckling", 7.5);
+        tree.insert("DA4004", "Introduktion till maskininlarning", 7.5);
+        tree.insert("DA4005", "Algoritmer och komplexitet", 7.5);
+        tree.insert("MM5016", "Numerisk analys I", 7.5);
+        tree.insert("DA5001", "Numerisk analys II", 7.5);
+        tree.insert("DA4003", "Programmeringsparadigm", 7.5);
+        tree.insert("DA4001", "Databasteknik I", 7.5);
+        int c = 0;
+        for (var x: tree) {
+            c++;
+            System.out.format("%s - %s: %.01f\n", x.getCourseCode(), x.getCourseName(), x.getCredits());
+        }
+
+        System.out.format("Total: %d\n\nRemove DA3018 && DA4005\n\n", c);
+        tree.remove("DA3018");
+        tree.remove("DA4005");
+
+        c = 0;
+        for (var x: tree) {
+            c++;
+            System.out.format("%s - %s: %.01f\n", x.getCourseCode(), x.getCourseName(), x.getCredits());
+        }
+        System.out.format("Total: %d", c);
+
     }
 
 
@@ -219,7 +257,6 @@ public class BinarySearchTree implements Iterable<BinarySearchTree.BSTNode> {
         public BSTNode getRightChild() {
             return right;
         }
-
-
     }
+
 }
