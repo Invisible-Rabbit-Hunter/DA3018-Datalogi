@@ -1,23 +1,13 @@
 /*
- * Implement a min heap, the generic programming version
- *
- * Java does not support arrays for generic types very well, (see the
- * constuctor!) so in the stub below you find some examples of dealing with
- * that.  As the book "Thinking in Java" points out, stuff like this exists also
- * in the Java libraries.
- *
- * There is little reason to work directly with arrays when programming in
- * modern Java, one is probably better off with an ArrayList or other suitable
- * standard datastructure, but in this class we try to work "low level" and
- * using a high level datastructure to implement a heap beats the purpose
- * of trying to make our own datastructure!
+ * Implement a min heap
  */
-import java.util.Arrays;
+package se.su.joos1190;
+
 import java.lang.Exception;
 
-public class Heap<E extends Comparable<E>> {
+public class Heap<E extends Comparable<E>> {                    // Note: just the skeleton of a class!
     private E[] heap_array;
-    private int n_elems = 0;
+    private int size = 0;
     private int capacity;
 
     /**
@@ -25,22 +15,63 @@ public class Heap<E extends Comparable<E>> {
      * Note how we no longer use the simple Java array creation.
      * That is not possible with generics, for technical reasons.
      *
-     * The tricks below causes compiler warnings, which are supressed here
+     * The tricks below causes compiler warnings, which are suppressed here
      * because they are planned (in some  sense) and supported by common
      * Java practice.
      */
     @SuppressWarnings("unchecked")
-    public Heap(Class<E> c, int _capacity) {
+    Heap(Class<E> c, int _capacity) {
         capacity = _capacity;
-        heap_array = (E[]) java.lang.reflect.Array.newInstance(c, capacity+1);
+        heap_array = (E[]) java.lang.reflect.Array.newInstance(c, capacity);
+    }
+    /*
+        i = 2
+        parent(i) = 0 = floor((2 + 1) / 2) - 1 = 1 - 1 = 0
+        left(i) = 5
+        right(i) = 6
+
+        i = 1
+        parent(i) = 0
+        left(i) = 3
+        right(i) = 4
+     */
+
+    private static int left(int i) {
+        return (i << 1) + 1;
+    }
+
+    private static int right(int i) {
+        return (i << 1) + 2;
+    }
+
+    private static int parent(int i) {
+        return (i - 1) >> 1;
     }
 
     /**
      * Private method for maintaining the heap.
+     *
      * @param i, index of the element to heapify from
      */
     private void heapify(int i) {
-        // To implement!
+        int l = left(i);
+        int r = right(i);
+        int least;
+
+        if (l <= size && heap_array[l].compareTo(heap_array[i]) < 0) {
+            least = l;
+        } else {
+            least = i;
+        }
+
+        if (r <= size && heap_array[r].compareTo(heap_array[least]) < 0) {
+            least = r;
+        }
+
+        if (least != i) {
+            swap(i, least);
+            heapify(least);
+        }
     }
 
     public int capacity() {
@@ -48,20 +79,39 @@ public class Heap<E extends Comparable<E>> {
     }
 
     public int size() {
-        return n_elems;
+        return size;
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isEmpty() {
-        return n_elems == 0;
+        return size == 0;
+    }
+
+    private void swap(int i, int j) {
+        E tmp = heap_array[i];
+        heap_array[i] = heap_array[j];
+        heap_array[j] = tmp;
     }
 
     /**
      * Add an element to the heap and ensure the heap property
      * Throws an exception if trying to add elements to a full heap.
+     *
      * @param x Element to add
      */
     public void insert(E x) throws Exception {
-        // To implement!
+        if (size >= capacity) {
+            throw new Exception("capacity reached");
+        }
+
+        heap_array[size] = x;
+
+        int i = size;
+        while (i > 1 && heap_array[parent(i)].compareTo(heap_array[i]) > 0) {
+            swap(i, parent(i));
+            i = parent(i);
+        }
+        size++;
     }
 
     /**
@@ -69,23 +119,28 @@ public class Heap<E extends Comparable<E>> {
      * Throws an exception if trying to extract an element from an empty heap.
      */
     public E extractMin() throws Exception {
-        // To implement!
+        if (size <= 0) {
+            throw new Exception("heap underflow");
+        }
+        E min = heap_array[0];
+        size--;
+        heap_array[0] = heap_array[size];
+        heapify(0);
+        return min;
     }
 
     /**
      * For convenience, a small program to test the code.
      * There are better ways of doing this kind of testing. See `junit`!
-     *
      */
-    static public void main(String args[]) {
+    static public void main(String[] args) { // A simple test program
         // Declare two heaps. Both should work nicely!
         // This time around, we store doubles instead of ints in one of the heaps.
         // Notice that we use wrapper classes Double and Integer instead of the primitive type double.
         // Java's primitive types have these wrappers for when a class is needed.
-        Heap<Double> h1 = new Heap<Double>(Double.class, 100);
-        Heap<Integer> h2 = new Heap<Integer>(Integer.class, 10);
-        int data[] = {1, 4, 10, 14, 7, 9, 3, 2, 8, 16};
-
+        var h1 = new Heap<>(Double.class, 100);
+        var h2 = new Heap<>(Integer.class, 10);
+        var data = new int[]{1, 4, 10, 14, 7, 9, 3, 2, 8, 16};
 
         //
         // Insert 1 element to heap 1, and several to heap 2.
@@ -95,7 +150,7 @@ public class Heap<E extends Comparable<E>> {
             h1.insert(7.0);       // Insert a single element in heap 1
 
             // Insert several elements in heap 2. Heap 1 must not be affected.
-            for (int x: data) {
+            for (var x: data) {
                 h2.insert(x);
             }
         } catch (Exception e) {
