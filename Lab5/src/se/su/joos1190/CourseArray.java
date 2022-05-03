@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class CourseArray {
-    public ArrayList<String> courses = new ArrayList<String>(); // Store course names in this attribute
+    public ArrayList<String> courses = new ArrayList<>(); // Store course names in this attribute
 
 
     CourseArray() {
@@ -57,9 +57,15 @@ public class CourseArray {
         }
         String[] helper = new String[courses.size()];
 
+        // This loop is O(n * lg n) time since it does O(lg n) iterations, and each iteration is really O(n) comparisons.
         for (int size = 1; size < courses.size(); size <<= 1) {
             for (int i = 0; i + size < courses.size(); i += 2 * size) {
-                merge(helper, i, i + size, Math.min(i + 2 * size, courses.size()));
+                // merge is O(size), and we have n/2size, so in all we get O(n) comparisons.
+                merge(helper, i, Math.min(i + size, courses.size()), Math.min(i + 2 * size, courses.size()));
+            }
+
+            for (int i = 0; i < courses.size(); i++) {
+                courses.set(i, helper[i]);
             }
         }
     }
@@ -67,27 +73,13 @@ public class CourseArray {
     private void merge(String[] helper, int start, int mid, int end) {
         int l = start, h = mid;
         for (int i = start; i < end; i++) {
-            if (l >= mid) {
-                helper[i] = courses.get(h);
-                h++;
-            } else if (h >= end) {
+            if (l < mid && (h >= end || courses.get(l).compareTo(courses.get(h)) <= 0)) {
                 helper[i] = courses.get(l);
                 l++;
             } else {
-                String x = courses.get(l);
-                String y = courses.get(h);
-                if (x.compareTo(y) < 0) {
-                    helper[i] = x;
-                    l++;
-                } else {
-                    helper[i] = y;
-                    h++;
-                }
+                helper[i] = courses.get(h);
+                h++;
             }
-        }
-
-        for (int i = start; i < end; i++) {
-            courses.set(i, helper[i]);
         }
     }
 
@@ -132,16 +124,22 @@ public class CourseArray {
     }
 
     /*
-     * loadData - Convenience function. Reads lines from stdin and put them in 'courses'.
+     * loadData - Convenience function. Reads all lines from stdin and put them in 'courses'.
      */
-    private void loadData() {
-        Scanner sc = new Scanner(System.in);
+    private void loadData(File file) throws FileNotFoundException {
+        Scanner sc;
+        if (file == null) {
+            sc = new Scanner(System.in);
+        } else {
+            sc = new Scanner(file);
+        }
         while (sc.hasNext()) {
             String c = sc.nextLine();
             courses.add(c);
         }
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean sorted() {
         for (int i=1; i<courses.size(); i++) {
             if (courses.get(i).compareTo(courses.get(i-1)) < 0) {
@@ -157,7 +155,16 @@ public class CourseArray {
         // data, but we can apply three different sorting algorithms on them independently.
         CourseArray courses1 = new CourseArray();
 
-        courses1.loadData();    // Read course names from stdin
+        File input = null;
+        if (args.length >= 1) {
+            input = new File(args[0]);
+        }
+
+        try {
+            courses1.loadData(input);    // Read course names from stdin
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         CourseArray courses2 = new CourseArray(courses1); // Copy the data to two more arrays using the copy-constructor
         CourseArray courses3 = new CourseArray(courses1);
 
