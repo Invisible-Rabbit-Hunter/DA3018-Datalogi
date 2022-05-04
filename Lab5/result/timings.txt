@@ -1,0 +1,16 @@
+--- Used on all_courses.txt
+
+First run:
+Time for task selectionSort: 603 ms
+Time for task mergeSort: 13 ms
+Time for task javaSort: 10 ms
+
+Second run:
+Time for task selectionSort: 635 ms
+Time for task mergeSort: 14 ms
+Time for task javaSort: 10 ms
+
+Third run:
+Time for task selectionSort: 610 ms
+Time for task mergeSort: 13 ms
+Time for task javaSort: 11 ms
